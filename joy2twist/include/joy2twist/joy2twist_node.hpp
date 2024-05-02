@@ -32,6 +32,7 @@ struct ButtonIndex
   int e_stop_reset;
   int e_stop_trigger;
   int enable_e_stop_reset;
+  int honk_horn_button;
 };
 
 class Joy2TwistNode : public rclcpp::Node
@@ -62,12 +63,14 @@ private:
   std::string e_stop_topic_;
   std::string e_stop_reset_srv_;
   std::string e_stop_trigger_srv_;
+  std::string honk_horn_srv_;
 
   rclcpp::Subscription<MsgBool>::SharedPtr e_stop_sub_;
   rclcpp::Subscription<MsgJoy>::SharedPtr joy_sub_;
   rclcpp::Publisher<MsgTwist>::SharedPtr twist_pub_;
   rclcpp::Client<SrvTrigger>::SharedPtr e_stop_reset_client_;
   rclcpp::Client<SrvTrigger>::SharedPtr e_stop_trigger_client_;
+  rclcpp::Client<SrvTrigger>::SharedPtr honk_horn_client_;
 };
 
 static constexpr char FAST[]{"fast"};

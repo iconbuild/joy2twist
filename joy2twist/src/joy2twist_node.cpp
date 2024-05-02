@@ -24,6 +24,8 @@ Joy2TwistNode::Joy2TwistNode() : Node("joy2twist_node")
     e_stop_trigger_client_ = this->create_client<SrvTrigger>(e_stop_trigger_srv_);
   }
 
+  honk_horn_client_ = this->create_client<SrvTrigger>(honk_horn_srv_);
+
   RCLCPP_INFO(get_logger(), "Initialized node!");
 }
 
@@ -40,6 +42,7 @@ void Joy2TwistNode::declare_parameters()
   this->declare_parameter<std::string>("e_stop.topic", "e_stop");
   this->declare_parameter<std::string>("e_stop.reset_srv", "e_stop_reset");
   this->declare_parameter<std::string>("e_stop.trigger_srv", "e_stop_trigger");
+  this->declare_parameter<std::string>("honk_horn","honk_horn");
 
   this->declare_parameter<int>("button_index_map.axis.angular_z", 2);
   this->declare_parameter<int>("button_index_map.axis.linear_x", 1);
@@ -65,6 +68,7 @@ void Joy2TwistNode::load_parameters()
   this->get_parameter<std::string>("e_stop.topic", e_stop_topic_);
   this->get_parameter<std::string>("e_stop.reset_srv", e_stop_reset_srv_);
   this->get_parameter<std::string>("e_stop.trigger_srv", e_stop_trigger_srv_);
+  this->get_parameter<std::string>("honk_horn",honk_horn_srv_);
 
   this->get_parameter<int>("button_index_map.axis.angular_z", button_index_.angular_z);
   this->get_parameter<int>("button_index_map.axis.linear_x", button_index_.linear_x);
@@ -76,6 +80,7 @@ void Joy2TwistNode::load_parameters()
   this->get_parameter<int>("button_index_map.e_stop_trigger", button_index_.e_stop_trigger);
   this->get_parameter<int>(
     "button_index_map.enable_e_stop_reset", button_index_.enable_e_stop_reset);
+  this->get_parameter<int>("button_index_map.honk_horn_button",button_index_.honk_horn_button);
 }
 
 void Joy2TwistNode::e_stop_cb(const MsgBool::SharedPtr bool_msg) { e_stop_state_ = bool_msg->data; }
@@ -94,6 +99,10 @@ void Joy2TwistNode::joy_cb(const MsgJoy::SharedPtr joy_msg)
       joy_msg->buttons.at(button_index_.e_stop_reset) && e_stop_state_) {
       call_trigger_service(e_stop_reset_client_);
     }
+  }
+
+  if (joy_msg->buttons.at(button_index_.honk_horn_button)){
+      call_trigger_service(honk_horn_client_);
   }
 
   if (joy_msg->buttons.at(button_index_.dead_man_switch)) {
